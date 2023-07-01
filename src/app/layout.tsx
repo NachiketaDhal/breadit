@@ -1,4 +1,5 @@
 import Navbar from "@/components/Navbar";
+import { Toaster } from "@/components/ui/Toaster";
 import { cn } from "@/lib/utils";
 import "@/styles/globals.css";
 import { Inter } from "next/font/google";
@@ -25,11 +26,12 @@ export default function RootLayout({
         inter.className
       )}
     >
-      <body className="min-h-screen pt-12 bg-slate-50 antialiased">
+      <body className="min-h-screen pt-12 antialiased bg-slate-50">
         <Navbar />
-        <div className="container max-w-7xl mx-auto h-full pt-12">
+        <div className="container h-full pt-12 mx-auto max-w-7xl">
           {children}
         </div>
+        <Toaster />
       </body>
     </html>
   );
