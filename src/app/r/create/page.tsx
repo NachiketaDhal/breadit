@@ -19,7 +19,8 @@ function page() {
       const payload: CreateSubredditPayload = {
         name: input,
       };
-      axios.post("/api/subreddit", payload);
+      const { data } = await axios.post("/api/subreddit", payload);
+      return data as string;
     },
     onError: (err) => {
       if (err instanceof AxiosError) {
