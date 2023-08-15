@@ -157,8 +157,8 @@ function Editor({ subredditId }: Pageprops) {
     }
   }, [errors]);
 
-  const onSubmit = (data: PostCreationRequest) => {
-    const blocks = ref.current?.save();
+  const onSubmit = async (data: PostCreationRequest) => {
+    const blocks = await ref.current?.save();
 
     const payload = {
       title: data.title,
