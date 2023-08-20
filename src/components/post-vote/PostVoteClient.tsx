@@ -13,7 +13,7 @@ import { toast } from "@/hooks/use-toast";
 interface PostVoteClientProps {
   postId: string;
   initialVotesAmt: number;
-  initialVote: VoteType | null;
+  initialVote: VoteType | undefined;
 }
 
 function PostVoteClient({
@@ -30,7 +30,11 @@ function PostVoteClient({
     setVotesAmt(initialVotesAmt);
   }, [initialVotesAmt]);
 
-  const { mutate: vote } = useMutation({
+  useEffect(() => {
+    setCurrentVote(initialVote);
+  }, [initialVote]);
+
+  const { mutate: vote, isLoading } = useMutation({
     mutationFn: async (voteType: VoteType) => {
       const payload: postVoteRequest = {
         postId,
@@ -38,6 +42,39 @@ function PostVoteClient({
       };
 
       await axios.patch("/api/subreddit/post/vote", payload);
+    },
+    onError: (error, type: VoteType) => {
+      if (type === "UP") setVotesAmt((prev) => prev - 1);
+      if (type === "DOWN") setVotesAmt((prev) => prev + 1);
+
+      // Reset to prev vote
+      setCurrentVote(prevVote);
+
+      if (error instanceof AxiosError) {
+        if (error.response?.status === 401) return loginToast();
+      }
+
+      return toast({
+        title: "Something went wrong.",
+        description: "Your vote was not registered. Please try again.",
+        variant: "destructive",
+      });
+    },
+    onMutate: (type: VoteType) => {
+      if (type === currentVote) {
+        // If we are doing upvote and the post is already upvoted(same incase of downvote)
+        // Just undo
+        setCurrentVote(undefined);
+        if (type === "UP") setVotesAmt((prev) => prev - 1);
+        if (type === "DOWN") setVotesAmt((prev) => prev + 1);
+      } else {
+        // If we are doing upvote and the post is downvoted(viceversa)
+        // No vote case will also be considered(currentVote is null)
+        setCurrentVote(type);
+        const requiredCount = currentVote ? 2 : 1; // When currentVote is null count should be 1 otherwise 2
+        if (type === "UP") setVotesAmt((prev) => prev + requiredCount);
+        if (type === "DOWN") setVotesAmt((prev) => prev - requiredCount);
+      }
     },
   });
 
@@ -49,6 +86,7 @@ function PostVoteClient({
         size="sm"
         variant="ghost"
         aria-label="upvote"
+        disabled={isLoading}
       >
         <ArrowBigUp
           className={cn("h-5 w-5 text-zinc-700", {
@@ -71,6 +109,7 @@ function PostVoteClient({
         })}
         variant="ghost"
         aria-label="downvote"
+        disabled={isLoading}
       >
         <ArrowBigDown
           className={cn("h-5 w-5 text-zinc-700", {
