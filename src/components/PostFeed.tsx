@@ -11,7 +11,7 @@ import Post from "./Post";
 
 interface PostFeedProps {
   initialPosts: ExtendedPost[];
-  subredditName: string;
+  subredditName?: string;
 }
 function PostFeed({ initialPosts, subredditName }: PostFeedProps) {
   const { data: session } = useSession();
