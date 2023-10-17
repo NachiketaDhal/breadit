@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { Comment, User, Vote } from "@prisma/client";
+import { Comment, CommentVote, User } from "@prisma/client";
 import { Button } from "./ui/Button";
 import { formatTimeToNow } from "@/lib/utils";
 import UserAvatar from "./UserAvatar";
@@ -19,12 +19,16 @@ import { toast } from "@/hooks/use-toast";
 
 type ExtendedComment = Comment & {
   author: User;
-  votes: Vote[];
+  votes: CommentVote[];
+  replies?: (Comment & {
+    author: User;
+    votes: CommentVote[];
+  })[];
 };
 
 interface PostCommentProps {
   comment: ExtendedComment;
-  currentVote: Vote | undefined;
+  currentVote: CommentVote | undefined;
   votesAmt: number;
   postId: string;
 }
