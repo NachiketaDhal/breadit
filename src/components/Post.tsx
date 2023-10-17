@@ -6,7 +6,7 @@ import { useRef } from "react";
 import EditorOutput from "./EditorOutput";
 import PostVoteClient from "./post-vote/PostVoteClient";
 
-type PartialVote = Pick<Vote, "type">;
+type PartialVote = Pick<Vote, "type"> | undefined;
 
 interface PostProps {
   subredditName: string;
